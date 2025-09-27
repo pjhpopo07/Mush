@@ -12,6 +12,7 @@ target_size = (512, 512) # 목표 크기를 229x229로 설정
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
+# 3. 설정한 이미지 폴더 안의 파일들을 하나씩 불러와서 처리합니다.
 for filename in os.listdir(image_folder):
     # .jpg나 .png 확장자를 가진 파일만 처리합니다.
     if filename.endswith('.jpg') or filename.endswith('.png'):
