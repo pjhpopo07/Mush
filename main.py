@@ -1,5 +1,6 @@
 # main.py
 
+import tensorflow as tf
 import os
 import datetime
 from model_builder import build_xception_model
