@@ -5,7 +5,7 @@ from PIL import Image
 # 'your_mushroom_images' 대신 실제 이미지 폴더 이름을 입력하세요.
 # 'resized_images'는 크기 조절된 이미지가 저장될 새로운 폴더입니다.
 image_folder = 'my_mushroom_images'
-output_folder = '마귀광대버섯 X299'
+output_folder = '붉은 뿔사슴버섯 X299'
 target_size = (299, 299) # 목표 크기를 229x229로 설정
 
 # 2. 크기 조절된 이미지를 저장할 폴더가 없으면 새로 만듭니다.
