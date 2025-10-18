@@ -26,6 +26,7 @@ def build_xception_model():
         base_model,                     # Xception 특징 추출기
         GlobalAveragePooling2D(),       # 2D 특징 맵을 1D 벡터로 압축
         Dense(512, activation='relu'),  # 추가 은닉층
+        tf.keras.layers.Dropout(0.5),   # Dropout(0.5) 계층 추가
         Dense(NUM_CLASSES, activation='softmax') # 최종 분류층
     ])
 

@@ -40,7 +40,7 @@ def main():
     )
 
     # 4. 모델 저장
-    model_save_path = "xception_mushroom_classifier.h5"
+    model_save_path = "기존 CNN 모델.h5"
     model.save(model_save_path)
     print(f"\n--- 4. 훈련 완료! 모델이 '{model_save_path}'에 저장되었습니다. ---")
 
