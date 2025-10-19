@@ -37,11 +37,11 @@ def main():
     
     # 1. 데이터 준비
     print("--- 1. 데이터 준비 중... ---")
-    train_gen, val_gen = prepare_data_generators()
+    train_gen, val_gen, num_classes = prepare_data_generators()
 
     # 2. 모델 생성
     print("\n--- 2. Xception 모델 생성 중... ---")
-    model = build_xception_model()
+    model = build_xception_model(num_classes)
     model.summary()
 
     # 3. 모델 훈련

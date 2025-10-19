@@ -7,7 +7,7 @@ from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.optimizers import Adam
 from config import IMAGE_SIZE, NUM_CLASSES, LEARNING_RATE # config 파일에서 설정값 불러오기
 
-def build_xception_model():
+def build_xception_model(num_classes):
     """사전 훈련된 Xception 모델을 기반으로 하는 전이 학습 모델을 생성하고 컴파일합니다."""
     
     # 1. 사전 훈련된 Xception 모델 불러오기 (특징 추출기)

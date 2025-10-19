@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from PIL import Image
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
 
 def get_augmentation_pipeline(target_size, is_train):
     """훈련 여부에 따라 Albumentations 파이프라인을 정의합니다."""
@@ -23,7 +25,7 @@ def get_augmentation_pipeline(target_size, is_train):
             A.HorizontalFlip(p=0.5),
             A.VerticalFlip(p=0.1),  # 버섯은 상하 대칭이 아닐 수 있으므로 확률을 낮춤
             A.GaussNoise(p=0.3),
-            A.Cutout(num_holes=8, max_h_size=32, max_w_size=32, fill_value=0, p=0.5), 
+            A.CoarseDropout(num_holes=8, max_h_size=32, max_w_size=32, fill_value=0, p=0.5), 
             A.CLAHE(p=0.3),
             A.RandomBrightnessContrast(p=0.4),
         ])
@@ -74,7 +76,7 @@ class AlbumentationsDataSequence(tf.keras.utils.Sequence):
 # ----------------------------------------------------------------------
 # 3. 데이터 로드 및 분할 (main.py에서 호출됨)
 # ----------------------------------------------------------------------
-def load_all_data(image_folder):
+def load_all_data(IMAGE_FOLDER):
     """모든 이미지 파일 경로와 레이블을 로드합니다."""
     # ... (생략, 기존 데이터 로드 및 레이블링 로직) ...
     # 이 함수는 이미지 경로와 원-핫 인코딩된 레이블을 반환합니다. 
@@ -82,10 +84,10 @@ def load_all_data(image_folder):
     
     image_paths = []
     labels = []
-    class_names = sorted(os.listdir(image_folder)) 
+    class_names = sorted(os.listdir(IMAGE_FOLDER)) 
     
     for class_idx, class_name in enumerate(class_names):
-        class_path = os.path.join(image_folder, class_name)
+        class_path = os.path.join(IMAGE_FOLDER, class_name)
         if os.path.isdir(class_path):
             for img_name in os.listdir(class_path):
                 if img_name.endswith(('.jpg', '.jpeg', '.png')):
@@ -123,4 +125,4 @@ def prepare_data_generators():
         x_val, y_val, BATCH_SIZE, val_pipeline
     )
     
-    return train_sequence, validation_sequence
+    return train_sequence, validation_sequence, num_classes
