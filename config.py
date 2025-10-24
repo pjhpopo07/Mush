@@ -1,7 +1,7 @@
 # config.py
 
 # 이미지 및 모델 설정
-IMAGE_SIZE = (299, 299)
+IMAGE_SIZE = (300, 300)
 NUM_CHANNELS = 3 # RGB 이미지이므로 3
 NUM_CLASSES = 5  # 분류할 버섯 종류의 수에 맞게 변경하세요!
 

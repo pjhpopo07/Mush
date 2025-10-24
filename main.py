@@ -3,7 +3,7 @@
 import tensorflow as tf
 import os
 import datetime
-from model_builder import build_xception_model
+from model_builder import build_efficientnetb3_model
 from data_processor import prepare_data_generators
 from config import EPOCHS, LEARNING_RATE
 
@@ -40,8 +40,8 @@ def main():
     train_gen, val_gen, num_classes = prepare_data_generators()
 
     # 2. 모델 생성
-    print("\n--- 2. Xception 모델 생성 중... ---")
-    model = build_xception_model(num_classes)
+    print("\n--- 2. efficientnetb3 모델 생성 중... ---")
+    model = build_efficientnetb3_model(num_classes)
     model.summary()
 
     # 3. 모델 훈련
@@ -68,7 +68,7 @@ def main():
     )
 
     # 4. 모델 저장
-    model_save_path = "기존 CNN 모델.h5"
+    model_save_path = "EfficientNetB3 모델.h5"
     model.save(model_save_path)
     print(f"\n--- 4. 훈련 완료! 모델이 '{model_save_path}'에 저장되었습니다. ---")
 

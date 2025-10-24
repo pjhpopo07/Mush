@@ -1,20 +1,20 @@
 # model_builder.py
 
 import tensorflow as tf
-from tensorflow.keras.applications import Xception
+from tensorflow.keras.applications import EfficientNetB3
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.optimizers import Adam
 from config import IMAGE_SIZE, NUM_CLASSES, LEARNING_RATE # config 파일에서 설정값 불러오기
 
-def build_xception_model(num_classes):
-    """사전 훈련된 Xception 모델을 기반으로 하는 전이 학습 모델을 생성하고 컴파일합니다."""
+def build_efficientnetb3_model(num_classes):
+    """사전 훈련된 efficientnetb3_model 모델을 기반으로 하는 전이 학습 모델을 생성하고 컴파일합니다."""
     
     # 1. 사전 훈련된 Xception 모델 불러오기 (특징 추출기)
     # include_top=False로 설정하여 원래의 분류층은 제거합니다.
-    base_model = Xception(weights='imagenet', 
+    base_model = EfficientNetB3(weights='imagenet', 
                           include_top=False, 
-                          input_shape=IMAGE_SIZE + (3,)) # (299, 299, 3)
+                          input_shape=IMAGE_SIZE + (3,)) 
 
     # 2. 베이스 모델의 가중치를 동결(Freeze)
     # 기존에 학습된 특징 추출 능력을 보호합니다.
@@ -39,5 +39,5 @@ def build_xception_model(num_classes):
 
 if __name__ == '__main__':
     # 모델 구조를 간단히 확인하기 위한 코드
-    model = build_xception_model()
+    model = build_efficientnetb3_model()
     model.summary()
