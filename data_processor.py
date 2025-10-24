@@ -2,7 +2,6 @@
 
 import albumentations as A
 from config import IMAGE_SIZE, BATCH_SIZE, VALIDATION_SPLIT, IMAGE_FOLDER
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 from PIL import Image
@@ -25,7 +24,7 @@ def get_augmentation_pipeline(target_size, is_train):
             A.HorizontalFlip(p=0.5),
             A.VerticalFlip(p=0.1),  # 버섯은 상하 대칭이 아닐 수 있으므로 확률을 낮춤
             A.GaussNoise(p=0.3),
-            A.CoarseDropout(num_holes=8, max_h_size=32, max_w_size=32, fill_value=0, p=0.5), 
+            A.CoarseDropout(max_holes=8, max_h_size=32, max_w_size=32, fill_value=0, p=0.5), 
             A.CLAHE(p=0.3),
             A.RandomBrightnessContrast(p=0.4),
         ])
