@@ -3,36 +3,36 @@ import numpy as np
 import os
 from PIL import Image
 
-# ----------------------------------------------------
+
 # 1. 모델 파일 및 설정 (Xception에 맞게 수정)
-# ----------------------------------------------------
+
 # 훈련 시 저장한 Xception 모델 파일 경로로 수정하세요.
-MODEL_PATH = 'Xception 모델.h5' 
+MODEL_PATH = '기존 CNN 모델.h5' 
 # Xception 모델의 표준 입력 크기는 299x299입니다.
 IMAGE_SIZE = (299, 299) 
 
 # 판독할 새로운 이미지 경로 (!!! 실행 전에 이 경로를 반드시 수정하세요 !!!)
-TEST_IMAGE_PATH = 'path/to/your/new_mushroom_photo.jpg' 
+TEST_IMAGE_PATH = 'reading_images/20210822_085806.jpg' 
 
-# ----------------------------------------------------
+
 # 2. 사용자 설정: 클래스 이름 및 안전 정보 정의
-# ----------------------------------------------------
+
 # 주의: 이 리스트의 순서는 훈련 시 데이터 프로세서가 읽은 5개 폴더의 순서와 EXACTLY 일치해야 합니다.
 # 실제 5개 클래스 이름으로 수정해야 합니다.
-CLASS_NAMES = ['bulgen_sasembbul', 'dokusan_gandea', 'magi_gandea', 'malgen_eajuream', 'noran_geam'] 
+CLASS_NAMES = ['노란개암버섯 X299', '독우산광대버섯 X299', '마귀광대버섯 X299', '맑은애주름버섯 X299', '붉은 뿔사슴버섯 X299'] 
 
-# 각 버섯 종류에 대한 안전 상태를 정의합니다.
+# 각 버섯 종류에 대한 안전 상태를 정의
 SAFETY_MAPPING = {
-    'bulgen_sasembbul': '✅ 식용 가능 (Edible)',
-    'dokusan_gandea':    '❌ 맹독성 독버섯 (POISONOUS)',
-    'magi_gandea':   '❌ 섭취 금지 (Poisonous)',
-    'malgen_eajuream':   '✅ 식용 가능 (Edible)',
-    'noran_geam':   '✅ 식용 가능 (Edible)',
+    '노란개암버섯 X299': ' 맹독성 독버섯 (POISONOUS)',
+    '독우산광대버섯 X299':    '맹독성 독버섯 (POISONOUS)',
+    '마귀광대버섯 X299':   '맹독성 독버섯 (POISONOUS)',
+    '맑은애주름버섯 X299':   '맹독성 독버섯 (POISONOUS)',
+    '붉은 뿔사슴버섯 X299':   '맹독성 독버섯 (POISONOUS)',
 }
 
 
 def load_and_preprocess_image(image_path, target_size):
-    """이미지를 로드하고 Xception 모델 입력에 맞게 전처리합니다."""
+    """이미지를 로드하고 Xception 모델 입력에 맞게 전처리"""
     try:
         # 1. 이미지 로드 및 크기 조정
         img = tf.keras.utils.load_img(image_path, target_size=target_size)
