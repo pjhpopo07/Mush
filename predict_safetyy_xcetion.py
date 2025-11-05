@@ -12,7 +12,7 @@ MODEL_PATH = '기존 CNN 모델.h5'
 IMAGE_SIZE = (299, 299) 
 
 # 판독할 새로운 이미지 경로 (!!! 실행 전에 이 경로를 반드시 수정하세요 !!!)
-TEST_IMAGE_PATH = 'reading_images/20210822_085806.jpg' 
+TEST_IMAGE_PATH = 'reading_images/natureobserve_0706040301730_932_342_crop.jpg' 
 
 
 # 2. 사용자 설정: 클래스 이름 및 안전 정보 정의
