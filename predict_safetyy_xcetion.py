@@ -79,24 +79,54 @@ def predict_safety(model_path, image_path):
     
     # 4. 결과 해석 (확률값으로 변환)
     score = tf.nn.softmax(predictions[0]) 
-    predicted_index = np.argmax(score) # 가장 높은 확률의 인덱스
-    confidence = np.max(score) * 100 # 확신도
+  
+    # 1. 클래스 이름과 확률을 쌍으로 묶습니다.
+    # score.numpy()를 사용하여 TensorFlow 텐서를 NumPy 배열로 변환합니다.
+    class_probabilities = list(zip(CLASS_NAMES, score.numpy()))
     
-    predicted_name = CLASS_NAMES[predicted_index]
-    safety_status = get_safety_status(predicted_name)
+    # 2. 확률을 기준으로 내림차순 정렬합니다.
+    sorted_probabilities = sorted(class_probabilities, key=lambda item: item[1], reverse=True)
+    top_n = 3
+    top_3_results = sorted_probabilities[:top_n]
     
-    # 5. 최종 결과 출력
+    # 3. 상위 3개 클래스만 선택합니다.
+    top_3_probs = [prob for name, prob in top_3_results]
+    sum_top_3_probs = sum(top_3_probs)
+    
+    # 4. 재정규화된 결과를 출력합니다.
+    if sum_top_3_probs > 0:
+        top_1_name = top_3_results[0][0]
+        top_1_prob_original = top_3_results[0][1]
+
+        top_1_confidence = (top_1_prob_original / sum_top_3_probs) * 100
+
+        predicted_name = top_1_name
+        safety_status = get_safety_status(predicted_name)
+
+    else:
+        # 합계가 0인 예외 상황 처리
+        top_1_confidence = 0.00
+        predicted_name = "판독 실패"
+        safety_status = "⚠️ 정보 부족 - 추가 확인 필요"
+
+        # 5. 최종 결과 출력 (TOP 3 기준)
     print("\n--- 3. 판독 및 안전 결과 ---")
     print(f"🍄 예측된 버섯 종류: {predicted_name}")
-    print(f"✨ 모델 확신도: {confidence:.2f}%")
+    print(f"✨ 모델 확신도: {top_1_confidence:.2f}%") # 재정규화된 TOP 1 확률 사용
     print("-" * 35)
     print(f"🚨 독/식용 최종 판별: {safety_status}")
     print("-" * 35)
     
-    print("\n[모든 클래스별 확률 (판독 정확도 확인)]")
-    for name, prob in zip(CLASS_NAMES, score):
-        print(f"- {name}: {prob*100:.2f}%")
-
+    # 6. 재정규화된 TOP 3 출력
+    print(f"\n[✨ TOP {top_n} 클래스 재정규화 확신도 결과 (총합 100%) ✨]")
+       
+    if sum_top_3_probs > 0:
+        for i, (name, prob) in enumerate(top_3_results):
+            renormalized_prob = (prob / sum_top_3_probs) * 100
+            print(f"  {i+1}. {name}: {renormalized_prob:.2f}%")
+    else:
+        print("  합계 확률이 0이어서 재정규화할 수 없습니다.")
+  
 if __name__ == '__main__':
     # Pillow (PIL) 라이브러리가 필요합니다.
     predict_safety(MODEL_PATH, TEST_IMAGE_PATH)
