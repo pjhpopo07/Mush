@@ -33,7 +33,8 @@ def build_xception_model(num_classes):
     # 4. 모델 컴파일
     model.compile(optimizer=Adam(learning_rate=LEARNING_RATE),
                   loss='categorical_crossentropy', # 다중 분류 손실 함수
-                  metrics=['accuracy'])
+                  metrics=['accuracy'],
+                  run_eagerly=True)
 
     return model
 
