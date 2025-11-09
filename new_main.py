@@ -8,13 +8,13 @@ if not tf.executing_eagerly():
 
 import os
 import datetime
-from model_builder import build_xception_model
 from data_processor import prepare_data_generators
 from config import EPOCHS, LEARNING_RATE
-import new_model_builder
+from new_model_builder import build_xception_model
+from tensorflow.keras.callbacks import LearningRateScheduler
 
 # 모델 파일 저장 경로를 기존과 분리합니다.
-MODEL_SAVE_PATH = "식용 이미지 추가한 CNN 모델.h5"
+MODEL_SAVE_PATH = "focal_xception_model.h5"
 
 def scheduler(epoch, lr):
     # config.py에서 정의된 초기 학습률 (목표 LR)
