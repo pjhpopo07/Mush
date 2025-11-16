@@ -7,12 +7,12 @@ from PIL import Image
 # 1. 모델 파일 및 설정 (Xception에 맞게 수정)
 
 # 훈련 시 저장한 Xception 모델 파일 경로로 수정하세요.
-MODEL_PATH = 'focal_xception_model.h5' 
+MODEL_PATH = '식용 이미지 추가한 CNN 모델.h5' 
 # Xception 모델의 표준 입력 크기는 299x299입니다.
 IMAGE_SIZE = (299, 299) 
 
 # 판독할 새로운 이미지 경로 (!!! 실행 전에 이 경로를 반드시 수정하세요 !!!)
-TEST_IMAGE_PATH = 'reading_images/dog_usan.jpg' 
+TEST_IMAGE_PATH = 'reading_images/독우산광대버섯테스트.jpg' 
 
 
 # 2. 사용자 설정: 클래스 이름 및 안전 정보 정의
