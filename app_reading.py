@@ -21,9 +21,92 @@ CONVNEXT_IMG_SIZE = (224, 224)
 CLASS_NAMES = ['개암버섯', '노란개암버섯', '독우산광대버섯', '마귀광대버섯', '맑은애주름버섯', 
                '붉은 뿔사슴버섯', '붉은점박이광대버섯', '영지버섯', '졸각버섯', '흰주름버섯'] 
 
+<<<<<<< HEAD
 # ======================================================================
 # 2. 모델 로드 및 유틸리티 함수
 # ======================================================================
+=======
+# SAFETY_MAPPING (10개 클래스의 독/식용 안전 정보)
+SAFETY_MAPPING = {
+    '개암버섯': '✅ 식용 버섯 (EDIBLE)', '노란개암버섯': '🚨 맹독성 독버섯 (POISONOUS)',
+    '독우산광대버섯': '☠️ 맹독성 독버섯 (POISONOUS)', '마귀광대버섯': '🚨 맹독성 독버섯 (POISONOUS)',
+    '맑은애주름버섯': '🚨 맹독성 독버섯 (POISONOUS)', '붉은 뿔사슴버섯': '🚨 맹독성 독버섯 (POISONOUS)',
+    '붉은점박이광대버섯': '✅ 식용 버섯 (EDIBLE)', '영지버섯': '✅ 식용 버섯 (EDIBLE)', 
+    '졸각버섯': '✅ 식용 버섯 (EDIBLE)', '흰주름버섯': '✅ 식용 버섯 (EDIBLE)',
+}
+# ==============================================================================
+
+# 🖼️ 배경 이미지 설정
+# ------------------------------------------------------------------------------------------------
+BACKGROUND_IMAGE_FILENAME = 'forest-7406241_1280.jpg' 
+
+def get_base64_of_image(image_path):
+    """이미지 파일을 읽어 Base64 문자열로 변환합니다."""
+    if not os.path.exists(image_path):
+        return None
+    
+    try:
+        with open(image_path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+        
+        # ⬇️ [핵심 수정] 줄바꿈 및 공백 문자를 제거하여 CSS 구문 오류를 방지합니다.
+        return encoded_string.replace('\n', '').strip() 
+        
+    except Exception as e:
+        print(f"🚨 배경 이미지 파일 로드 오류: {e}")
+        return None
+
+def set_custom_style(background_image_base64):
+    """Streamlit 앱의 제목 영역에만 배경 이미지 CSS를 적용합니다."""
+    st.markdown(
+        f"""
+        <style>
+        /* 1. [최종 수정] HTML BODY 자체에 배경을 설정하여 이미지 누락 방지 */
+        /* 이 방법은 가장 포괄적인 배경 설정을 보장합니다. */
+        body {{
+            background-image: url("data:image/jpeg;base64,{background_image_base64}");
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed;
+            height: 150px;
+            padding: 0 !important;
+
+        }}
+        /* 2. Streamlit의 기본 배경색을 제거하여 이미지 보이도록 함 */
+        .stApp, .block-container, [data-testid="stHeader"] ~div{{
+            background-color: transparent !important; 
+        }}
+        
+        /* 3. 메인 콘텐츠 영역의 배경을 반투명하게 설정 */
+        .block-container {{ 
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }}
+        
+        /* 4. 제목 텍스트 스타일 (유지) */
+        h1 {{
+            color: #ffffff; 
+            text-shadow: 2px 2px 5px #000000;
+            text-align: center;
+            font-size: 3.5em; 
+            padding-top: 0px; 
+            padding-bottom: 0px; 
+            line-height: 150px;
+            margin-bottom: 0;
+        }}
+        /* 기타 스타일 유지 */
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
+# ------------------------------------------------------------------------------------------------
+
+
+# --- 함수 정의 ---
+>>>>>>> 07e5b37738f25cf6523f37a8e4a24d20b99b92b0
 
 @st.cache_resource
 def load_all_models_and_prep():
