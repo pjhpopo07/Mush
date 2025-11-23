@@ -66,15 +66,17 @@ def set_custom_style(background_image_base64):
             background-position: center; 
             background-repeat: no-repeat; 
             background-attachment: fixed;
+            height: 150px;
+            padding: 0 !important;
+
         }}
         /* 2. Streamlit의 기본 배경색을 제거하여 이미지 보이도록 함 */
-        .stApp, [data-testid="stHeader"] {{
+        .stApp, .block-container, [data-testid="stHeader"] ~div{{
             background-color: transparent !important; 
         }}
         
         /* 3. 메인 콘텐츠 영역의 배경을 반투명하게 설정 */
         .block-container {{ 
-            background-color: rgba(255, 255, 255, 0.9); /* 흰색 반투명 */
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
@@ -86,8 +88,9 @@ def set_custom_style(background_image_base64):
             text-shadow: 2px 2px 5px #000000;
             text-align: center;
             font-size: 3.5em; 
-            padding-top: 50px; 
-            padding-bottom: 50px; 
+            padding-top: 0px; 
+            padding-bottom: 0px; 
+            line-height: 150px;
             margin-bottom: 0;
         }}
         /* 기타 스타일 유지 */
