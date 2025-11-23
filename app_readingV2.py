@@ -1,5 +1,4 @@
-# 1. 필요 라이브러리 설치 (로컬 환경에서 터미널에서 실행)
-# pip install gradio tensorflow pandas pillow
+
 
 # 2. 필요 라이브러리 임포트
 import gradio as gr
@@ -8,10 +7,21 @@ from PIL import Image
 import numpy as np
 import os
 import pandas as pd
-# from google.colab import drive # ⛔ 로컬 환경에서는 제거
+
+
+# 💡 [핵심 수정 1] Keras 백엔드를 TensorFlow로 명시 (Keras 3 호환성)
+os.environ["KERAS_BACKEND"] = "tensorflow" 
+import keras
+print(f"Keras Backend: {os.environ.get('KERAS_BACKEND')}")
+
+# --- Google Drive 마운트 ---
+try:
+    drive.mount('/content/drive', force_remount=True)
+    print("Google Drive 마운트 성공")
+except Exception as e:
+    print(f"Google Drive 마운트 실패: {e}")
 
 # --- 모델별 전처리 함수 임포트 ---
-# Colab 환경과 동일하게 임포트합니다.
 from tensorflow.keras.applications.xception import preprocess_input as xception_preprocess
 from tensorflow.keras.applications.convnext import preprocess_input as convnext_preprocess
 
@@ -30,8 +40,7 @@ def categorical_focal_loss(gamma=2.0, alpha=0.25):
     return focal_loss
 
 # ======================================================================
-# ❗ [사용자 설정] (로컬 경로로 변경)
-# 코드 파일과 같은 경로에 모델 파일이 있다고 가정합니다.
+# ❗ [사용자 설정] (Google Drive 경로)
 # ======================================================================
 XCEPTION_MODEL_PATH = '식용 이미지 추가한 CNN 모델.h5'
 CONVNEXT_MODEL_PATH = 'convnext.keras'
@@ -39,65 +48,69 @@ XCEPTION_IMG_SIZE = (299, 299)
 CONVNEXT_IMG_SIZE = (224, 224)
 
 # ======================================================================
-# ✅ 3. 클래스 이름 직접 정의 (로컬 환경 권장)
-# Colab에서 데이터 폴더를 스캔했던 방식을 로컬에서는 직접 정의로 변경합니다.
+# ✅ 3. 데이터 폴더에서 클래스 이름 로드
 # ======================================================================
-# ⚠️ [필수] 훈련 시 사용한 EXACTLY 동일한 클래스 순서로 정의해야 합니다.
-CLASS_NAMES = [
-    '개암버섯', '노란개암버섯', '독우산광대버섯', '마귀광대버섯', 
-    '맑은애주름버섯', '붉은 뿔사슴버섯', '붉은점박이광대버섯', '영지버섯', 
-    '졸각버섯', '흰주름버섯' 
-]
-print(f"✅ 클래스 목록 직접 정의 완료: {len(CLASS_NAMES)}개")
+IMAGE_FOLDER = 'your_mushroom_images'
+try:
+    if not os.path.exists(IMAGE_FOLDER):
+        raise FileNotFoundError(f"경로를 찾을 수 없습니다: {IMAGE_FOLDER}")
+    all_items = os.listdir(IMAGE_FOLDER)
+    class_names = sorted([d for d in all_items if os.path.isdir(os.path.join(IMAGE_FOLDER, d)) and not d.startswith('.')])
+    if not class_names:
+        raise FileNotFoundError(f"경로에 클래스 하위 폴더가 없습니다: {IMAGE_FOLDER}")
+    print(f"✅ 데이터 폴더에서 클래스 로드 완료: {len(class_names)}개")
+    print(f"클래스 목록: {class_names}")
+except Exception as e:
+    print(f"⚠️ 클래스 폴더({IMAGE_FOLDER}) 스캔 실패: {e}.")
+    raise e
 
 # ======================================================================
-# ✅ 4. Custom Objects로 실제 모델 로드 (경로 변경 후 시도)
+# ✅ 4. Custom Objects로 실제 모델 로드 (수정 적용)
 # ======================================================================
 try:
     print("--- 실제 모델 로드를 시작합니다 ---")
-    custom_loss = {
-        'focal_loss': categorical_focal_loss(gamma=2.0, alpha=0.25)
+    
+    # 💡 [핵심 수정 2] custom_objects에 Dense 및 Pooling 레이어를 명시적으로 추가
+    custom_objects = {
+        'focal_loss': categorical_focal_loss(gamma=2.0, alpha=0.25),
+        'Dense': tf.keras.layers.Dense,
+        'GlobalAveragePooling2D': tf.keras.layers.GlobalAveragePooling2D
     }
     
     # 1. Xception 모델 로드
-    if not os.path.exists(XCEPTION_MODEL_PATH):
-        raise FileNotFoundError(f"Xception 모델 파일을 찾을 수 없습니다: {XCEPTION_MODEL_PATH}")
     xception_model = tf.keras.models.load_model(
         XCEPTION_MODEL_PATH,
-        custom_objects=custom_loss
+        custom_objects=custom_objects
     )
     
-    # 2. ConvNeXt 모델 로드
-    if not os.path.exists(CONVNEXT_MODEL_PATH):
-        raise FileNotFoundError(f"ConvNeXt 모델 파일을 찾을 수 없습니다: {CONVNEXT_MODEL_PATH}")
+    # 2. ConvNeXt 모델 로드 (여기서 오류가 발생했었음)
     convnext_model = tf.keras.models.load_model(
         CONVNEXT_MODEL_PATH,
-        custom_objects=custom_loss
+        custom_objects=custom_objects # 수정된 custom_objects 적용
     )
     
     print("✅ Xception, ConvNeXt 실제 모델 로드 성공!")
 except Exception as e:
-    print(f"⛔ [오류] 모델 로드 실패. 파일 경로를 확인하세요: {e}")
-    # 로컬 환경에서는 Gradio 실행을 막기 위해 raise
+    print(f"⛔ [오류] 모델 로드 실패: {e}")
+    # 모델 로드 실패 시, Gradio 앱 실행을 막기 위해 raise
     raise e
 
 # ======================================================================
-# ✅ 5. 'Label' 컴포넌트용 예측 함수 (동일)
+# ✅ 5. 예측 함수
 # ======================================================================
 
 def preprocess_image(image_pil, target_size, preprocess_function):
-    # (이전과 동일)
     image_resized = image_pil.resize(target_size, Image.LANCZOS)
     image_np = np.array(image_resized)
+    # 이미지 채널 보정 (흑백/4채널 이미지 처리)
     if image_np.ndim == 2: image_np = np.stack([image_np]*3, axis=-1)
     elif image_np.shape[2] == 4: image_np = image_np[..., :3]
     image_batch = np.expand_dims(image_np, axis=0)
     return preprocess_function(image_batch.astype('float32'))
 
 def format_predictions_for_label(predictions, class_names):
-    """ BarPlot(DataFrame) 대신 Label(Dictionary) 형식으로 반환 """
-    # Softmax 적용하여 확률로 변환 (모델에서 최종 활성화 함수가 linear일 경우 필요)
-    # Gradio Label 컴포넌트는 Softmax가 적용된 0~1 사이의 값을 기대함.
+    """ Label(Dictionary) 형식으로 반환 """
+    # Softmax 적용하여 확률로 변환 (모델의 최종 활성화 함수가 linear일 경우 필요)
     predictions = tf.nn.softmax(predictions).numpy()
     confidences = {class_names[i]: float(predictions[i]) for i in range(len(class_names))}
     return confidences
@@ -105,17 +118,16 @@ def format_predictions_for_label(predictions, class_names):
 def predict_xception_model(image_pil):
     """ Xception 모델 실제 예측 """
     processed_batch = preprocess_image(image_pil, XCEPTION_IMG_SIZE, xception_preprocess)
-    # verbose=0으로 설정하여 콘솔 출력을 깔끔하게 유지
-    predictions = xception_model.predict(processed_batch, verbose=0)[0] 
-    return format_predictions_for_label(predictions, CLASS_NAMES)
+    predictions = xception_model.predict(processed_batch, verbose=0)[0]
+    return format_predictions_for_label(predictions, class_names)
 
 def predict_convnext_model(image_pil):
     """ ConvNeXt 모델 실제 예측 """
     processed_batch = preprocess_image(image_pil, CONVNEXT_IMG_SIZE, convnext_preprocess)
     predictions = convnext_model.predict(processed_batch, verbose=0)[0]
-    return format_predictions_for_label(predictions, CLASS_NAMES)
+    return format_predictions_for_label(predictions, class_names)
 
-# --- 6. Gradio 인터페이스 메인 함수 (동일) ---
+# --- 6. Gradio 인터페이스 메인 함수 ---
 def compare_models(input_image):
     if input_image is None:
         return None, None, None, None
@@ -129,7 +141,7 @@ def compare_models(input_image):
     return image_pil, xception_result, image_pil, convnext_result
 
 # ======================================================================
-# ✅ 7. Gradio UI 빌드 (동일)
+# ✅ 7. Gradio UI 빌드 (Soft 테마)
 # ======================================================================
 
 # Apple의 파란색 링크/버튼과 깔끔한 느낌을 위해 Soft 테마 적용
@@ -179,7 +191,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="blue")) a
                 num_top_classes=3
             )
 
-    # 4. 이벤트 연결 (동일)
+    # 4. 이벤트 연결
     image_input.change(
         fn=compare_models,
         inputs=[image_input],
@@ -190,6 +202,5 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="blue")) a
     )
 
 # 8. 앱 실행
-print("\n--- Gradio UI (Local)을 실행합니다 ---")
-# VS Code 터미널에서 실행 시 debug=True로 유지
+print("\n--- Gradio UI (Colab)을 실행합니다 ---")
 demo.launch(debug=True)
