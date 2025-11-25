@@ -241,4 +241,4 @@ if all_models:
                             st.markdown("##### 📈 TOP 3 확신도 분산")
                             st.bar_chart(chart_data, x='버섯 종류', y='확신도 (%)')
                         
-                st.markdown("---")
+                st.markdown("---")c
