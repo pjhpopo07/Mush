@@ -1,3 +1,4 @@
+
 # main.py
 
 import tensorflow as tf
@@ -37,6 +38,7 @@ def main():
     
     # 1. 데이터 준비
     print("--- 1. 데이터 준비 중... ---")
+    # prepare_data_generators는 train_gen, val_gen, num_classes를 반환합니다.
     train_gen, val_gen, num_classes = prepare_data_generators()
 
     # 2. 모델 생성
@@ -68,7 +70,7 @@ def main():
     )
 
     # 4. 모델 저장
-    model_save_path = "기존 CNN 모델.h5"
+    model_save_path = "xception_model.kears"
     model.save(model_save_path)
     print(f"\n--- 4. 훈련 완료! 모델이 '{model_save_path}'에 저장되었습니다. ---")
 

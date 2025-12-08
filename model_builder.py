@@ -5,7 +5,7 @@ from tensorflow.keras.applications import Xception
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.optimizers import Adam
-from config import IMAGE_SIZE, NUM_CLASSES, LEARNING_RATE # config 파일에서 설정값 불러오기
+from config import IMAGE_SIZE, LEARNING_RATE # config 파일에서 설정값 불러오기
 
 def build_xception_model(num_classes):
     """사전 훈련된 Xception 모델을 기반으로 하는 전이 학습 모델을 생성하고 컴파일합니다."""
@@ -26,8 +26,8 @@ def build_xception_model(num_classes):
         base_model,                     # Xception 특징 추출기
         GlobalAveragePooling2D(),       # 2D 특징 맵을 1D 벡터로 압축
         Dense(512, activation='relu'),  # 추가 은닉층
-        tf.keras.layers.Dropout(0.5),   # Dropout(0.5) 계층 추가
-        Dense(NUM_CLASSES, activation='softmax') # 최종 분류층
+        tf.keras.layers.Dropout(0.5),   # Dropout(0.5) 계층 추가 
+        Dense(num_classes, activation='softmax') # 최종 분류층 (입력받은 num_classes 사용)
     ])
 
     # 4. 모델 컴파일
@@ -38,6 +38,6 @@ def build_xception_model(num_classes):
     return model
 
 if __name__ == '__main__':
-    # 모델 구조를 간단히 확인하기 위한 코드
-    model = build_xception_model()
+    # 모델 구조를 간단히 확인하기 위한 예시 (클래스 10개로 가정)
+    model = build_xception_model(num_classes=10)
     model.summary()

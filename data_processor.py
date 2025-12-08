@@ -51,7 +51,6 @@ class AlbumentationsDataSequence(tf.keras.utils.Sequence):
 
     def __getitem__(self, idx):
         batch_indices = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
-        
         batch_x = []
         batch_y = self.y[batch_indices] 
         

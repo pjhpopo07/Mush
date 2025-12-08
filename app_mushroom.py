@@ -3,13 +3,13 @@ import tensorflow as tf
 import numpy as np
 import os
 from PIL import Image
-from tensorflow.keras.applications.xception import preprocess_input 
+from tensorflow.keras.applications.efficientnet import preprocess_input # 전처리 함수 변경
 
 # ==============================================================================
 # ⚙️ 1. 설정 (필수 수정 영역)
 # ==============================================================================
-MODEL_PATH = '식용 이미지 추가한 CNN 모델.h5' 
-IMAGE_SIZE = (299, 299) 
+MODEL_PATH = 'CNN.keras' # 모델 경로 변경
+IMAGE_SIZE = (600, 600) # 이미지 크기 변경
 CLASS_NAMES = ['개암버섯', '노란개암버섯', '독우산광대버섯', '마귀광대버섯', '맑은애주름버섯', 
                '붉은 뿔사슴버섯', '붉은점박이광대버섯', '영지버섯', '졸각버섯', '흰주름버섯'] 
 
@@ -69,8 +69,8 @@ def load_model_once(path):
         st.error(f"🚨 오류: 모델 파일이 존재하지 않습니다: {os.path.basename(path)}")
         return None
     try:
-        model = tf.keras.models.load_model(path)
-        st.success(f"✅ Xception 모델 로드 성공: {os.path.basename(path)}")
+        model = tf.keras.models.load_model(path, compile=False) # <--- compile=False 추가
+        st.success(f"✅ EfficientNetB7 모델 로드 성공: {os.path.basename(path)}")
         return model
     except Exception as e:
         st.error(f"🚨 치명적 오류: 모델 로드 실패 (호환성 문제): {e}")
@@ -92,8 +92,7 @@ def get_safety_status(mushroom_name):
 # --- Streamlit UI 시작 ---
 st.set_page_config(page_title="Xception 버섯 판독 시스템", layout="wide") # wide 레이아웃 사용
 set_custom_style()
-
-st.title("🍄 Xception 기반 버섯 안전 판독 시스템")
+st.title("🍄 EfficientNetB7 기반 버섯 안전 판독 시스템")
 st.caption("AI 딥러닝 모델을 활용한 독/식용 버섯 판별 서비스")
 
 # 1. 모델 로드
